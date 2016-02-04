@@ -46,6 +46,7 @@ var (
 	oAuthScopes      = []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"}
 	sessionOptions   = gsessions.Options{Secure: true, HttpOnly: true}
 	boltStoreOptions = bstore.Config{SessionOptions: sessionOptions}
+	whitelist        = []string{"edward@heroku.com"}
 )
 
 // Authorize the user based on email and a set OpenIDUser
@@ -58,7 +59,15 @@ func authorize(s sessions.Session, rw http.ResponseWriter, req *http.Request) {
 
 	openIDUser := s.Get("OpenIDUser")
 	if openIDUser != nil && openIDUser != "" {
-		req.Header.Set("X-Openid-User", openIDUser.(string))
+		u := openIDUser.(string)
+		for _, i := range whitelist {
+			if i == u {
+				req.Header.Set("X-Openid-User", u)
+				return
+			}
+		}
+		// User not in the whitelist, try again.
+		http.Redirect(rw, req, cfg.AuthPath, http.StatusFound)
 	} else {
 		// No openIDUser set, so abort and restart the auth flow
 		http.Redirect(rw, req, cfg.AuthPath, http.StatusFound)
