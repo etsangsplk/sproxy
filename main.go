@@ -46,7 +46,7 @@ var (
 	oAuthScopes      = []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"}
 	sessionOptions   = gsessions.Options{Secure: true, HttpOnly: true}
 	boltStoreOptions = bstore.Config{SessionOptions: sessionOptions}
-	whitelist        = []string{"edward@heroku.com"}
+	whitelist        = []string{"edward"}
 )
 
 // Authorize the user based on email and a set OpenIDUser
